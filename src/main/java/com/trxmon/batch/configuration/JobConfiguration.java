@@ -12,6 +12,7 @@ import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.listener.ExecutionContextPromotionListener;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
@@ -41,13 +42,13 @@ public class JobConfiguration {
     @Bean
     public MultiResourceItemReader<Alert> multiResourceItemReader() {
         MultiResourceItemReader<Alert> reader = new MultiResourceItemReader<>();
-        reader.setDelegate(alertItemReader());
+        reader.setDelegate(alertFlatFileItemReader());
         reader.setResources(inputFiles);
         return reader;
     }
 
     @Bean
-    public FlatFileItemReader<Alert> alertItemReader() {
+    public FlatFileItemReader<Alert> alertFlatFileItemReader() {
         FlatFileItemReader<Alert> reader = new FlatFileItemReader<>();
         reader.setLinesToSkip(1);
         //reader.setResource(new ClassPathResource("data/alert1.csv"));
@@ -78,6 +79,7 @@ public class JobConfiguration {
                 .reader(multiResourceItemReader())  //alertItemReader()
                 .processor(alertItemProcessor())
                 .writer(alertItemWriter())
+                .listener(promotionListener())
                 .build();
     }
 
@@ -88,6 +90,12 @@ public class JobConfiguration {
                 .build();
     }
 
+    @Bean
+    public ExecutionContextPromotionListener promotionListener() {
+        ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
+        listener.setKeys(new String[] {"count"});
+        return listener;
+    }
     @Bean
     public Job job() {
         System.out.println(BananaUtils.bananaify("Spring Batch", Font.ANSI_SHADOW));

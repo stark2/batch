@@ -26,7 +26,7 @@ public class AlertItemWriter<Alert> implements ItemWriter<Alert> {
             ExecutionContext stepContext = this.stepExecution.getExecutionContext();
             int count = stepContext.containsKey("count") ? stepContext.getInt("count") : 0;
             System.out.println("count=" + (count + list.size()) + ", list.size="  + list.size());
-            stepContext.put("count", count + list.size());
+            stepContext.put("count", (count + list.size()));
     }
 
     @BeforeStep
