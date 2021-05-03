@@ -19,6 +19,8 @@ import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.MultiResourceItemReader;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
+import org.springframework.batch.item.support.ClassifierCompositeItemWriter;
+import org.springframework.batch.item.support.CompositeItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -26,6 +28,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -36,7 +39,7 @@ public class JobConfiguration {
     @Autowired
     public StepBuilderFactory stepBuilderFactory;
 
-    @Value("classpath*:data/alert*.csv")
+    @Value("classpath*:data/alert*.json")
     private Resource[] inputFiles;
 
     @Bean
@@ -50,11 +53,12 @@ public class JobConfiguration {
     @Bean
     public FlatFileItemReader<Alert> alertFlatFileItemReader() {
         FlatFileItemReader<Alert> reader = new FlatFileItemReader<>();
-        reader.setLinesToSkip(1);
+        //reader.setLinesToSkip(1);
         //reader.setResource(new ClassPathResource("data/alert1.csv"));
         DefaultLineMapper<Alert> alertLineMapper = new DefaultLineMapper<>();
-        DelimitedLineTokenizer tokenizer = new DelimitedLineTokenizer();
-        tokenizer.setNames(new String[] {"alert_id", "alert_type", "alert_description", "alert_date"});
+        //DelimitedLineTokenizer tokenizer = new DelimitedLineTokenizer();
+        //tokenizer.setNames(new String[] {"alert_id", "alert_type", "alert_description", "alert_date"});
+        JsonLineTokenizer tokenizer = new JsonLineTokenizer();
         alertLineMapper.setLineTokenizer(tokenizer);
         alertLineMapper.setFieldSetMapper(new AlertFieldSetMapper());
         alertLineMapper.afterPropertiesSet();
