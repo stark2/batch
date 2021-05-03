@@ -66,11 +66,19 @@ public class JobConfiguration {
     }
 
     @Bean
+    public ValidatingItemProcessor validatingItemProcessor() {
+        ValidatingItemProcessor<Alert> alertValidatingItemProcessor =
+                new ValidatingItemProcessor<>(new AlertItemValidator());
+        alertValidatingItemProcessor.setFilter(true);
+        return alertValidatingItemProcessor;
+    }
+
+    @Bean
     public CompositeItemProcessor<Alert, Alert> compositeItemProcessor() throws Exception {
         List<ItemProcessor<Alert, Alert>> delegates = new ArrayList<>(3);
         delegates.add(new AlertItemProcessor());
         delegates.add(new AlertItemProcessor2());
-        delegates.add(new ValidatingItemProcessor<>(new AlertItemValidator()));
+        delegates.add(validatingItemProcessor());
 
         CompositeItemProcessor<Alert, Alert> compositeItemProcessor = new CompositeItemProcessor<>();
         compositeItemProcessor.setDelegates(delegates);
