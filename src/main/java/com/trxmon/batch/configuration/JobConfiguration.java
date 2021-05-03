@@ -10,14 +10,19 @@ import org.springframework.batch.core.configuration.annotation.EnableBatchProces
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.listener.ExecutionContextPromotionListener;
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.MultiResourceItemReader;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
+import org.springframework.batch.item.support.CompositeItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Configuration
 @EnableBatchProcessing
@@ -60,23 +65,36 @@ public class JobConfiguration {
     }
 
     @Bean
+    public CompositeItemProcessor<Alert, Alert> compositeItemProcessor() throws Exception {
+        List<ItemProcessor<Alert, Alert>> delegates = new ArrayList<>(2);
+        delegates.add(new AlertItemProcessor());
+        delegates.add(new AlertItemProcessor2());
+
+        CompositeItemProcessor<Alert, Alert> compositeItemProcessor = new CompositeItemProcessor<>();
+        compositeItemProcessor.setDelegates(delegates);
+        compositeItemProcessor.afterPropertiesSet();
+
+        return compositeItemProcessor;
+    }
+
+    @Bean
     public AlertItemWriter<Alert> alertItemWriter() {
         return new AlertItemWriter<Alert>();
     }
 
     @Bean
-    public Step step1() {
+    public Step step1() throws Exception {
         return stepBuilderFactory.get("step1")
                 .<Alert, Alert>chunk(2)
                 .reader(multiResourceItemReader())  //alertItemReader()
-                .processor(alertItemProcessor())
+                .processor(compositeItemProcessor())  //alertItemProcessor()
                 .writer(alertItemWriter())
                 .listener(promotionListener())
                 .build();
     }
 
     @Bean
-    public Step step2() {
+    public Step step2() throws Exception {
         return stepBuilderFactory.get("step2")
                 .tasklet(new EnrichmentTask())
                 .build();
@@ -89,7 +107,7 @@ public class JobConfiguration {
         return listener;
     }
     @Bean
-    public Job job() {
+    public Job job() throws Exception {
         System.out.println(BananaUtils.bananaify("Spring Batch", Font.ANSI_SHADOW));
         return jobBuilderFactory.get("job")
                 .listener(new JobResultListener())
