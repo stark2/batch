@@ -15,6 +15,7 @@ import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.MultiResourceItemReader;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.support.CompositeItemProcessor;
+import org.springframework.batch.item.validator.ValidatingItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -66,9 +67,10 @@ public class JobConfiguration {
 
     @Bean
     public CompositeItemProcessor<Alert, Alert> compositeItemProcessor() throws Exception {
-        List<ItemProcessor<Alert, Alert>> delegates = new ArrayList<>(2);
+        List<ItemProcessor<Alert, Alert>> delegates = new ArrayList<>(3);
         delegates.add(new AlertItemProcessor());
         delegates.add(new AlertItemProcessor2());
+        delegates.add(new ValidatingItemProcessor<>(new AlertItemValidator()));
 
         CompositeItemProcessor<Alert, Alert> compositeItemProcessor = new CompositeItemProcessor<>();
         compositeItemProcessor.setDelegates(delegates);
