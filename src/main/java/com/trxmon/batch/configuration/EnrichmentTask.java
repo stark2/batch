@@ -1,4 +1,4 @@
-package com.trxmon.batch.domain;
+package com.trxmon.batch.configuration;
 
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;

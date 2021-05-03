@@ -1,4 +1,4 @@
-package com.trxmon.batch.domain;
+package com.trxmon.batch.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.batch.item.file.transform.DefaultFieldSet;

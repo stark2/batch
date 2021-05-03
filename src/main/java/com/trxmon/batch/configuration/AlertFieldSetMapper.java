@@ -1,5 +1,6 @@
-package com.trxmon.batch.domain;
+package com.trxmon.batch.configuration;
 
+import com.trxmon.batch.domain.Alert;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.FieldSet;
 

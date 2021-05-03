@@ -1,5 +1,6 @@
-package com.trxmon.batch.domain;
+package com.trxmon.batch.configuration;
 
+import com.trxmon.batch.domain.Alert;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemProcessor;
 
