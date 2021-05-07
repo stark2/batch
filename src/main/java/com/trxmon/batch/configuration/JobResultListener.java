@@ -31,7 +31,7 @@ public class JobResultListener implements JobExecutionListener {
         JobParameters parameters = jobExecution.getJobParameters();
 
         if(jobExecution.getStatus() == BatchStatus.FAILED){
-            System.out.println("Job failed with exceptions:");
+            System.err.println("Job failed with exceptions:");
             List<Throwable> exceptionList = jobExecution.getAllFailureExceptions();
             for(Throwable the : exceptionList){
                 System.err.println("Exception: " + the.getLocalizedMessage());

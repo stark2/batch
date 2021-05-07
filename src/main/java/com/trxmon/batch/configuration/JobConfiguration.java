@@ -5,9 +5,13 @@ import com.trxmon.batch.domain.*;
 import io.leego.banana.BananaUtils;
 import io.leego.banana.Font;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.listener.ExecutionContextPromotionListener;
 import org.springframework.batch.core.partition.support.MultiResourcePartitioner;
@@ -25,6 +29,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.SyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +46,8 @@ public class JobConfiguration {
     private Resource[] inputFiles;
 
     @Bean
-    public MultiResourceItemReader<Alert> multiResourceItemReader() {
+    @StepScope
+    public MultiResourceItemReader<Alert> multiResourceItemReader() throws InterruptedException {
         MultiResourceItemReader<Alert> reader = new MultiResourceItemReader<>();
         reader.setDelegate(alertFlatFileItemReader());
         reader.setResources(inputFiles);
@@ -48,14 +55,17 @@ public class JobConfiguration {
     }
 
     @Bean
+    @StepScope
     public Partitioner partitioner() {
         MultiResourcePartitioner partitioner = new MultiResourcePartitioner();
         partitioner.setResources(inputFiles);
         partitioner.setKeyName("file");
+        //partitioner.partition(10);
         return partitioner;
     }
 
     @Bean
+    @StepScope
     public FlatFileItemReader<Alert> alertFlatFileItemReader() {
         FlatFileItemReader<Alert> reader = new FlatFileItemReader<>();
         reader.setSaveState(true);
@@ -106,24 +116,33 @@ public class JobConfiguration {
     }
 
     @Bean
-    public SimpleAsyncTaskExecutor taskExecutor() {
-        return new SimpleAsyncTaskExecutor();
+    @StepScope
+    public TaskExecutor executor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(inputFiles.length);
+        executor.setMaxPoolSize(inputFiles.length);
+        executor.setThreadNamePrefix("multi-thread-");
+        executor.setWaitForTasksToCompleteOnShutdown(Boolean.TRUE);
+        executor.initialize();
+        executor.afterPropertiesSet();
+        return executor;
     }
 
     @Bean
+    @JobScope
     public Step masterStep() throws Exception {
         return stepBuilderFactory.get("masterStep")
                 .partitioner(slaveStep1().getName(), partitioner())
                 .step(slaveStep1())
-                .gridSize(4)
-                .taskExecutor(taskExecutor())
+                .gridSize(inputFiles.length)
+                .taskExecutor(executor())
                 .build();
     }
 
     @Bean
     public Step slaveStep1() throws Exception {
         return stepBuilderFactory.get("step1")
-                .<Alert, Alert>chunk(2)
+                .<Alert, Alert>chunk(1)
                 .reader(multiResourceItemReader())  //alertItemReader()
                 .processor(compositeItemProcessor())  //alertItemProcessor()
                 .writer(alertItemWriter())

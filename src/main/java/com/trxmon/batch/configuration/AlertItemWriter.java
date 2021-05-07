@@ -9,6 +9,7 @@ import org.springframework.batch.item.ItemWriter;
 
 import java.util.List;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
 
 public class AlertItemWriter<Alert> implements ItemWriter<Alert> {
 
@@ -18,15 +19,18 @@ public class AlertItemWriter<Alert> implements ItemWriter<Alert> {
 
     @Override
     public void write(List<? extends Alert> list) throws Exception {
-            JobParameters parameters = stepExecution.getJobExecution().getJobParameters();
-            String jobID = parameters.getString("JobID");
-            for (Alert alert : list) {
-                System.out.println(jobID + ": " + alert.toString());
-            }
-            ExecutionContext stepContext = this.stepExecution.getExecutionContext();
-            int count = stepContext.containsKey("count") ? stepContext.getInt("count") : 0;
-            System.out.println("count=" + (count + list.size()) + ", list.size="  + list.size());
-            stepContext.put("count", (count + list.size()));
+        JobParameters parameters = stepExecution.getJobExecution().getJobParameters();
+        String jobID = parameters.getString("JobID");
+        String tName = (Thread.currentThread().getName());
+
+        for (Alert alert : list) {
+            System.out.println(tName + ", " + jobID + ": " + alert.toString());
+        }
+
+        ExecutionContext stepContext = this.stepExecution.getExecutionContext();
+        int count = stepContext.containsKey(tName + "-count") ? stepContext.getInt(tName + "-count") : 0;
+        stepContext.put(tName + "-count", (count + list.size()));
+        //System.out.println(tName + ", count=" + (count + list.size()) + ", list.size="  + list.size());
     }
 
     @BeforeStep
