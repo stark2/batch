@@ -6,10 +6,12 @@ import io.leego.banana.BananaUtils;
 import io.leego.banana.Font;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.listener.ExecutionContextPromotionListener;
+import org.springframework.batch.core.partition.support.MultiResourcePartitioner;
+import org.springframework.batch.core.partition.support.Partitioner;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.MultiResourceItemReader;
@@ -21,12 +23,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.core.task.SyncTaskExecutor;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Configuration
-@EnableBatchProcessing
 public class JobConfiguration {
     @Autowired
     public JobBuilderFactory jobBuilderFactory;
@@ -45,8 +48,17 @@ public class JobConfiguration {
     }
 
     @Bean
+    public Partitioner partitioner() {
+        MultiResourcePartitioner partitioner = new MultiResourcePartitioner();
+        partitioner.setResources(inputFiles);
+        partitioner.setKeyName("file");
+        return partitioner;
+    }
+
+    @Bean
     public FlatFileItemReader<Alert> alertFlatFileItemReader() {
         FlatFileItemReader<Alert> reader = new FlatFileItemReader<>();
+        reader.setSaveState(true);
         //reader.setLinesToSkip(1);
         //reader.setResource(new ClassPathResource("data/alert1.csv"));
         DefaultLineMapper<Alert> alertLineMapper = new DefaultLineMapper<>();
@@ -94,7 +106,22 @@ public class JobConfiguration {
     }
 
     @Bean
-    public Step step1() throws Exception {
+    public SimpleAsyncTaskExecutor taskExecutor() {
+        return new SimpleAsyncTaskExecutor();
+    }
+
+    @Bean
+    public Step masterStep() throws Exception {
+        return stepBuilderFactory.get("masterStep")
+                .partitioner(slaveStep1().getName(), partitioner())
+                .step(slaveStep1())
+                .gridSize(4)
+                .taskExecutor(taskExecutor())
+                .build();
+    }
+
+    @Bean
+    public Step slaveStep1() throws Exception {
         return stepBuilderFactory.get("step1")
                 .<Alert, Alert>chunk(2)
                 .reader(multiResourceItemReader())  //alertItemReader()
@@ -108,6 +135,7 @@ public class JobConfiguration {
     public Step step2() throws Exception {
         return stepBuilderFactory.get("step2")
                 .tasklet(new EnrichmentTask())
+                .taskExecutor(new SyncTaskExecutor())
                 .build();
     }
 
@@ -121,8 +149,9 @@ public class JobConfiguration {
     public Job job() throws Exception {
         System.out.println(BananaUtils.bananaify("Spring Batch", Font.ANSI_SHADOW));
         return jobBuilderFactory.get("job")
+                .incrementer(new RunIdIncrementer())
                 .listener(new JobResultListener())
-                .start(step1())
+                .start(masterStep())
                 .next(step2())
                 .build();
     }
