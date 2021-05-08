@@ -30,6 +30,7 @@ public class JobResultListener implements JobExecutionListener {
 
         JobParameters parameters = jobExecution.getJobParameters();
 
+        /*
         if(jobExecution.getStatus() == BatchStatus.FAILED){
             System.err.println("Job failed with exceptions:");
             List<Throwable> exceptionList = jobExecution.getAllFailureExceptions();
@@ -37,5 +38,6 @@ public class JobResultListener implements JobExecutionListener {
                 System.err.println("Exception: " + the.getLocalizedMessage());
             }
         }
+        */
     }
 }

@@ -29,7 +29,7 @@ public class BatchApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception
 	{
-		UUID jobID = UUID.randomUUID();
+		UUID jobID = UUID.fromString("4dddbe5d-1291-46ac-9635-3714160e2e6d"); //UUID.randomUUID();
 
 		JobParameters params = new JobParametersBuilder()
 				.addString("JobID", jobID.toString()) // String.valueOf(System.currentTimeMillis())

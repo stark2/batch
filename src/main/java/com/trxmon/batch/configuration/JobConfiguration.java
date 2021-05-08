@@ -5,11 +5,8 @@ import com.trxmon.batch.domain.*;
 import io.leego.banana.BananaUtils;
 import io.leego.banana.Font;
 import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
@@ -27,7 +24,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -46,7 +42,6 @@ public class JobConfiguration {
     private Resource[] inputFiles;
 
     @Bean
-    @StepScope
     public MultiResourceItemReader<Alert> multiResourceItemReader() throws InterruptedException {
         MultiResourceItemReader<Alert> reader = new MultiResourceItemReader<>();
         reader.setDelegate(alertFlatFileItemReader());
@@ -55,17 +50,6 @@ public class JobConfiguration {
     }
 
     @Bean
-    @StepScope
-    public Partitioner partitioner() {
-        MultiResourcePartitioner partitioner = new MultiResourcePartitioner();
-        partitioner.setResources(inputFiles);
-        partitioner.setKeyName("file");
-        //partitioner.partition(10);
-        return partitioner;
-    }
-
-    @Bean
-    @StepScope
     public FlatFileItemReader<Alert> alertFlatFileItemReader() {
         FlatFileItemReader<Alert> reader = new FlatFileItemReader<>();
         reader.setSaveState(true);
@@ -115,6 +99,7 @@ public class JobConfiguration {
         return new AlertItemWriter<Alert>();
     }
 
+    /*
     @Bean
     @StepScope
     public TaskExecutor executor() {
@@ -129,18 +114,27 @@ public class JobConfiguration {
     }
 
     @Bean
-    @JobScope
+    public Partitioner partitioner() {
+        MultiResourcePartitioner partitioner = new MultiResourcePartitioner();
+        partitioner.setResources(inputFiles);
+        partitioner.setKeyName("file");
+        //partitioner.partition(10);
+        return partitioner;
+    }
+
+    @Bean
     public Step masterStep() throws Exception {
         return stepBuilderFactory.get("masterStep")
-                .partitioner(slaveStep1().getName(), partitioner())
-                .step(slaveStep1())
+                .partitioner(step1().getName(), partitioner())
+                .step(step1())
                 .gridSize(inputFiles.length)
                 .taskExecutor(executor())
                 .build();
     }
+    */
 
     @Bean
-    public Step slaveStep1() throws Exception {
+    public Step step1() throws Exception {
         return stepBuilderFactory.get("step1")
                 .<Alert, Alert>chunk(1)
                 .reader(multiResourceItemReader())  //alertItemReader()
@@ -153,7 +147,7 @@ public class JobConfiguration {
     @Bean
     public Step step2() throws Exception {
         return stepBuilderFactory.get("step2")
-                .tasklet(new EnrichmentTask())
+                .tasklet(new CleanupTask())
                 .taskExecutor(new SyncTaskExecutor())
                 .build();
     }
@@ -161,16 +155,17 @@ public class JobConfiguration {
     @Bean
     public ExecutionContextPromotionListener promotionListener() {
         ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
-        listener.setKeys(new String[] {"count"});
+        listener.setKeys(new String[] {"count", "aaa"});
         return listener;
     }
+
     @Bean
     public Job job() throws Exception {
         System.out.println(BananaUtils.bananaify("Spring Batch", Font.ANSI_SHADOW));
         return jobBuilderFactory.get("job")
                 .incrementer(new RunIdIncrementer())
                 .listener(new JobResultListener())
-                .start(masterStep())
+                .start(step1())
                 .next(step2())
                 .build();
     }
