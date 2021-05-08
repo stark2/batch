@@ -1,4 +1,4 @@
 {"alert_id": 6, "alert_type": "M_M", "alert_description": "d6", "alert_date": "2021-06-01 07:20:12"}
 {"alert_id": 7, "alert_type": "M_M", "alert_description": "d7", "alert_date": "2021-06-01 07:21:22"}
-{"alert_id": 8, "alert_type": "F_M", "alert_description": "d8", "alert_date": "2021-06-01 07:22:32"}
+{"alert_id": 8, "alert_type": "M_M", "alert_description": "d8", "alert_date": "2021-06-01 07:22:32"}
 {"alert_id": 9, "alert_type": "M_M", "alert_description": "d9", "alert_date": "2021-06-01 07:23:42"}

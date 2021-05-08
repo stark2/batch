@@ -1,1 +1,13 @@
 spring.batch.job.enabled: false
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/batch
+    username: batch_user
+    password: password
+  batch:
+    initialize-schema: never
+
+#spring.datasource.schema: classpath:/schema.sql
+#spring.datasource.continue-on-error: true
+#spring.batch.initialize-schema: always
