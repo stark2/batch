@@ -1,4 +1,4 @@
-package com.trxmon.batch.configuration;
+package com.trxmon.batch.configuration.writer;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobParameters;
@@ -9,11 +9,10 @@ import org.springframework.batch.item.ItemWriter;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.batch.item.validator.ValidationException;
 
 public class AlertItemWriter<Alert> implements ItemWriter<Alert> {
 
@@ -27,12 +26,20 @@ public class AlertItemWriter<Alert> implements ItemWriter<Alert> {
         String jobID = parameters.getString("JobID");
         String tName = (Thread.currentThread().getName());
 
+        String tmpdir = System.getProperty("java.io.tmpdir");
+        String outFile = tName + ".out";
+
         for (Alert alert : list) {
-            System.out.println(tName + ", " + jobID + ": " + alert.toString());
+            System.out.println(tName + ", " + jobID + ": " + alert.toString() + ", stored in: "
+                    + tmpdir + outFile);
+
+            if (13 == ((com.trxmon.batch.domain.Alert)alert).getId()) {
+                throw new ValidationException("Simulated error when writing alert: " + alert + " to "
+                        + tmpdir + outFile);
+            }
 
             Files.writeString(
-                    //Path.of(System.getProperty("java.io.tmpdir"),
-                    Path.of("/Users/david/Documents/Data/java-workspace/batch/src/main/resources/data", tName + ".out"),
+                    Path.of(tmpdir, outFile),
                     alert + System.lineSeparator(),
                     StandardOpenOption.CREATE, StandardOpenOption.APPEND
             );

@@ -1,5 +1,12 @@
 package com.trxmon.batch.configuration;
 
+import com.trxmon.batch.configuration.filter.AlertItemFilter;
+import com.trxmon.batch.configuration.mapper.AlertFieldSetMapper;
+import com.trxmon.batch.configuration.mapper.JsonLineTokenizer;
+import com.trxmon.batch.configuration.processor.AlertItemProcessor;
+import com.trxmon.batch.configuration.processor.AlertItemProcessor2;
+import com.trxmon.batch.configuration.processor.AlertItemValidator;
+import com.trxmon.batch.configuration.writer.AlertItemWriter;
 import com.trxmon.batch.domain.*;
 
 import io.leego.banana.BananaUtils;
@@ -8,11 +15,8 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.listener.ExecutionContextPromotionListener;
-import org.springframework.batch.core.partition.support.MultiResourcePartitioner;
-import org.springframework.batch.core.partition.support.Partitioner;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.MultiResourceItemReader;
@@ -25,8 +29,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.core.task.SyncTaskExecutor;
-import org.springframework.core.task.TaskExecutor;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.ArrayList;
 import java.util.List;

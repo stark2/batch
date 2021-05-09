@@ -2,6 +2,7 @@ spring.batch.job.enabled: false
 
 spring:
   datasource:
+    platform: postgres
     url: jdbc:postgresql://localhost:5432/batch
     username: batch_user
     password: password
