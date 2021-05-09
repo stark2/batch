@@ -143,6 +143,7 @@ public class JobConfiguration {
                 .processor(compositeItemProcessor())  //alertItemProcessor()
                 .writer(alertItemWriter())
                 .listener(promotionListener())
+                .taskExecutor(new SyncTaskExecutor())
                 .build();
     }
 
@@ -164,6 +165,7 @@ public class JobConfiguration {
     @Bean
     public Job job() throws Exception {
         System.out.println(BananaUtils.bananaify("Spring Batch", Font.ANSI_SHADOW));
+
         return jobBuilderFactory.get("job")
                 .incrementer(new RunIdIncrementer())
                 .listener(new JobResultListener())

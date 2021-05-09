@@ -23,14 +23,13 @@ public class AlertItemWriter<Alert> implements ItemWriter<Alert> {
     @Override
     public void write(List<? extends Alert> list) throws Exception {
         JobParameters parameters = stepExecution.getJobExecution().getJobParameters();
-        String jobID = parameters.getString("JobID");
         String tName = (Thread.currentThread().getName());
 
         String tmpdir = System.getProperty("java.io.tmpdir");
         String outFile = tName + ".out";
 
         for (Alert alert : list) {
-            System.out.println(tName + ", " + jobID + ": " + alert.toString() + ", stored in: "
+            System.out.println("[" + tName + "] " + alert.toString() + ", stored in: "
                     + tmpdir + outFile);
 
             if (13 == ((com.trxmon.batch.domain.Alert)alert).getId()) {
