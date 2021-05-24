@@ -1,11 +1,11 @@
-welcomeMessage: "Spring Batch - DEFAULT"
+welcomeMessage: "Spring Batch - prod"
 
 spring.batch.job.enabled: false
 
 spring:
   config:
     activate:
-      on-profile: default
+      on-profile: prod
   datasource:
     platform: POSTGRES
     url: jdbc:postgresql://localhost:5432/batch

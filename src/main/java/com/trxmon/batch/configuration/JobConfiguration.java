@@ -43,6 +43,9 @@ public class JobConfiguration {
     @Value("classpath*:data/alert*.json")
     private Resource[] inputFiles;
 
+    @Value("${welcomeMessage}")
+    private String welcomeMessage;
+
     @Bean
     public MultiResourceItemReader<Alert> multiResourceItemReader() throws InterruptedException {
         MultiResourceItemReader<Alert> reader = new MultiResourceItemReader<>();
@@ -164,7 +167,7 @@ public class JobConfiguration {
 
     @Bean
     public Job job() throws Exception {
-        System.out.println(BananaUtils.bananaify("Spring Batch", Font.ANSI_SHADOW));
+        System.out.println(BananaUtils.bananaify(welcomeMessage, Font.ANSI_SHADOW));
 
         return jobBuilderFactory.get("job")
                 .incrementer(new RunIdIncrementer())

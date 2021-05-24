@@ -1,0 +1,28 @@
+welcomeMessage: "Spring Batch - dev"
+
+spring.batch.job.enabled: false
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+  h2:
+    console:
+      enabled: true
+      path: /h2
+  datasource:
+    platform: H2
+    url: jdbc:h2:file:~/spring-boot-h2-db
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  batch:
+    initialize-schema: always
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+
+#spring.datasource.schema: classpath:/schema.sql
+#spring.datasource.continue-on-error: true
+#spring.batch.initialize-schema: always
