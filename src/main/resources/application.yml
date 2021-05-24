@@ -1,6 +1,7 @@
 welcomeMessage: "Spring Batch - DEFAULT"
 
 spring.batch.job.enabled: false
+spring.main.banner-mode: on
 
 spring:
   config:

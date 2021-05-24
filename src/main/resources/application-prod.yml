@@ -1,6 +1,7 @@
 welcomeMessage: "Spring Batch - prod"
 
 spring.batch.job.enabled: false
+spring.main.banner-mode: off
 
 spring:
   config:
