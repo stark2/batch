@@ -12,9 +12,12 @@ import com.trxmon.batch.domain.*;
 import io.leego.banana.BananaUtils;
 import io.leego.banana.Font;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobParametersValidator;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.CompositeJobParametersValidator;
+import org.springframework.batch.core.job.DefaultJobParametersValidator;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.listener.ExecutionContextPromotionListener;
 import org.springframework.batch.item.ItemProcessor;
@@ -31,6 +34,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.task.SyncTaskExecutor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -165,11 +169,32 @@ public class JobConfiguration {
         return listener;
     }
 
+    /*
+    @Bean
+    public JobParametersValidator validator() {
+        DefaultJobParametersValidator validator = new DefaultJobParametersValidator();
+        validator.setRequiredKeys(new String[]{"alert_path"});
+        validator.setRequiredKeys(new String[]{"alert_date"});
+        return validator;
+    }
+    */
+
+    @Bean
+    public CompositeJobParametersValidator validator() {
+        CompositeJobParametersValidator validator = new CompositeJobParametersValidator();
+        DefaultJobParametersValidator defaultJobParametersValidator =
+                new DefaultJobParametersValidator(new String[]{"alert_path", "alert_date"}, new String[]{});
+        defaultJobParametersValidator.afterPropertiesSet();
+        validator.setValidators(Arrays.asList(defaultJobParametersValidator, new ParameterValidator()));
+        return validator;
+    }
+
     @Bean
     public Job job() throws Exception {
         System.out.println(BananaUtils.bananaify(welcomeMessage, Font.ANSI_SHADOW));
 
         return jobBuilderFactory.get("job")
+                .validator(validator())
                 .incrementer(new RunIdIncrementer())
                 .listener(new JobResultListener())
                 .start(step1())
