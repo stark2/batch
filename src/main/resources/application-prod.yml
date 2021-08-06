@@ -1,6 +1,7 @@
 welcomeMessage: "Spring Batch - prod"
 
 spring.batch.job.enabled: false
+spring.batch.jmx.enabled: true
 spring.main.banner-mode: off
 
 spring:
@@ -13,8 +14,11 @@ spring:
     username: batch_user
     password: password
   batch:
-    initialize-schema: always
+    initialize-schema: never
+    table-prefix: MM_
 
-#spring.datasource.schema: classpath:/schema.sql
+#spring.datasource.schema: classpath:/schema-postgres.sql
 #spring.datasource.continue-on-error: true
 #spring.batch.initialize-schema: always
+#spring.batch.table-prefix: MM_
+
