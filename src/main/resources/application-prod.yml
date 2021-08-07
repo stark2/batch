@@ -8,17 +8,34 @@ spring:
   config:
     activate:
       on-profile: prod
+
+primary:
   datasource:
-    platform: POSTGRES
-    url: jdbc:postgresql://localhost:5432/batch
+    jdbcUrl: jdbc:postgresql://localhost:5432/batch
     username: batch_user
     password: password
-  batch:
-    initialize-schema: never
+
+batch:
+  datasource:
+    jdbcUrl: jdbc:postgresql://localhost:5432/batch
+    username: batch_user
+    password: password
     table-prefix: MM_
 
-#spring.datasource.schema: classpath:/schema-postgres.sql
-#spring.datasource.continue-on-error: true
-#spring.batch.initialize-schema: always
-#spring.batch.table-prefix: MM_
+---
 
+spring:
+  profiles: pki
+
+primary:
+  datasource:
+    jdbcUrl: jdbc:postgresql://localhost:5432/batch_pki
+    username: batch_user_pki
+    password: password
+
+batch:
+  datasource:
+    jdbcUrl: jdbc:postgresql://localhost:5432/batch_pki
+    username: batch_user_pki
+    password: password
+    table-prefix: M2_
