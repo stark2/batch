@@ -12,13 +12,13 @@ import javax.sql.DataSource;
 public class DataSourceConfiguration {
     @Bean
     @Primary
-    @ConfigurationProperties("primary.datasource")
+    @ConfigurationProperties("datasource.primary")
     public DataSource domainDataSource() {
         return DataSourceBuilder.create().build();
     }
 
     @Bean("batchDataSource")
-    @ConfigurationProperties("batch.datasource")
+    @ConfigurationProperties("datasource.batch")
     public DataSource batchDataSource() {
         return DataSourceBuilder.create().build();
     }

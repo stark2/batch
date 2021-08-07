@@ -26,7 +26,7 @@ import javax.sql.DataSource;
 public class BatchConfiguration extends DefaultBatchConfigurer {
     private static final Log log = LogFactory.getLog(BatchConfiguration.class);
 
-    @Value("${batch.datasource.table-prefix}")
+    @Value("${datasource.batch.table-prefix}")
     private String table_prefix;
 
     private DataSource dataSource;

@@ -9,14 +9,12 @@ spring:
     activate:
       on-profile: prod
 
-primary:
-  datasource:
+datasource:
+  primary:
     jdbcUrl: jdbc:postgresql://localhost:5432/batch
     username: batch_user
     password: password
-
-batch:
-  datasource:
+  batch:
     jdbcUrl: jdbc:postgresql://localhost:5432/batch
     username: batch_user
     password: password
@@ -27,15 +25,13 @@ batch:
 spring:
   profiles: pki
 
-primary:
-  datasource:
-    jdbcUrl: jdbc:postgresql://localhost:5432/batch_pki
-    username: batch_user_pki
+datasource:
+  primary:
+    jdbcUrl: jdbc:postgresql://localhost:5432/batch
+    username: batch_user
     password: password
-
-batch:
-  datasource:
-    jdbcUrl: jdbc:postgresql://localhost:5432/batch_pki
-    username: batch_user_pki
+  batch:
+    jdbcUrl: jdbc:postgresql://localhost:5432/batch
+    username: batch_user
     password: password
-    table-prefix: M2_
+    table-prefix: MM_
