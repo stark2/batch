@@ -1,4 +1,4 @@
-package com.trxmon.batch.configuration.writer;
+package com.trxmon.batch.writer;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobParameters;

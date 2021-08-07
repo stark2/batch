@@ -1,4 +1,4 @@
-package com.trxmon.batch.configuration;
+package com.trxmon.batch.validator;
 
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersInvalidException;

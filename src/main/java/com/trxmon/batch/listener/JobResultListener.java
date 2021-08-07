@@ -1,17 +1,12 @@
-package com.trxmon.batch.configuration;
+package com.trxmon.batch.listener;
 
-import com.trxmon.batch.BatchApplication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
 
 import org.joda.time.DateTime;
 import org.springframework.batch.core.JobParameters;
-
-import java.util.List;
-import java.util.UUID;
 
 
 public class JobResultListener implements JobExecutionListener {

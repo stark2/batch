@@ -1,4 +1,4 @@
-package com.trxmon.batch.configuration.processor;
+package com.trxmon.batch.validator;
 
 import com.trxmon.batch.domain.Alert;
 import org.springframework.batch.item.validator.ValidationException;

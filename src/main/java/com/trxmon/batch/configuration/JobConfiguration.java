@@ -1,18 +1,20 @@
 package com.trxmon.batch.configuration;
 
-import com.trxmon.batch.configuration.filter.AlertItemFilter;
-import com.trxmon.batch.configuration.mapper.AlertFieldSetMapper;
-import com.trxmon.batch.configuration.mapper.JsonLineTokenizer;
-import com.trxmon.batch.configuration.processor.AlertItemProcessor;
-import com.trxmon.batch.configuration.processor.AlertItemProcessor2;
-import com.trxmon.batch.configuration.processor.AlertItemValidator;
-import com.trxmon.batch.configuration.writer.AlertItemWriter;
+import com.trxmon.batch.filter.AlertItemFilter;
+import com.trxmon.batch.listener.JobResultListener;
+import com.trxmon.batch.mapper.AlertFieldSetMapper;
+import com.trxmon.batch.mapper.JsonLineTokenizer;
+import com.trxmon.batch.processor.AlertItemProcessor;
+import com.trxmon.batch.processor.AlertItemProcessor2;
+import com.trxmon.batch.processor.CleanupTask;
+import com.trxmon.batch.validator.AlertItemValidator;
+import com.trxmon.batch.validator.ParameterValidator;
+import com.trxmon.batch.writer.AlertItemWriter;
 import com.trxmon.batch.domain.*;
 
 import io.leego.banana.BananaUtils;
 import io.leego.banana.Font;
 import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobParametersValidator;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -28,14 +30,11 @@ import org.springframework.batch.item.support.CompositeItemProcessor;
 import org.springframework.batch.item.validator.ValidatingItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.core.task.SyncTaskExecutor;
 
-import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

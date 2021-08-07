@@ -1,4 +1,4 @@
-package com.trxmon.batch.configuration;
+package com.trxmon.batch.processor;
 
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;

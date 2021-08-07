@@ -1,4 +1,4 @@
-package com.trxmon.batch.configuration.filter;
+package com.trxmon.batch.filter;
 
 import com.trxmon.batch.domain.Alert;
 import org.slf4j.Logger;
